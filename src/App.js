@@ -1,23 +1,31 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import ItemList from './components/ItemList';
 import './App.css';
 
 function App() {
+  // Load the basket from localStorage when it renders initially
+  const initialBasket = JSON.parse(localStorage.getItem("basket")) || [];
+  const [basket, setBasket] = useState(initialBasket);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Shopping Basket</h1>
+      <div>
+        <h2>Available Items</h2>
+        <ul>
+          {ItemList.map((item) =>{
+            return (
+              <li key={item.id}>
+                {item.name} - €{item.price}
+                <button>Add to Basket</button>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+      <div>
+        <h2>Basket</h2>
+      </div>
     </div>
   );
 }
