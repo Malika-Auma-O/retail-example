@@ -7,7 +7,8 @@ function App() {
   // If the data doesn't exist or can't be parsed, default to an empty array.
   const initialBasket = JSON.parse(localStorage.getItem("basket")) || [];
   const [basket, setBasket] = useState(initialBasket);
-
+  const [discount, setDiscount] = useState(false);
+  const [discountedTotal, setDiscountedTotal] = useState(0)
   // function to add item to the list
   const handleAddItem= (itemId) => {
     const itemToAdd = ItemList.find((item) => item.id === itemId);
@@ -53,6 +54,17 @@ function App() {
 
   // Function to handle the buy button click
   const handleBuy = () =>{
+    // Check if the total exceeds €100 and apply discount
+    const totalPrice = getTotalPrice();
+    let discountedTotal = totalPrice;
+    if (totalPrice > 100){
+      discountedTotal = Math.round(totalPrice*0.9);
+      alert("You have qualified for a 10% discount.")
+      setDiscount(true);
+    }
+
+    setDiscountedTotal(discountedTotal);
+
     // Create an XML representation of the basket
     let xmlData = "<basket>";
     basket.forEach((item) => {
@@ -60,24 +72,23 @@ function App() {
     });
     xmlData += "</basket>";
     console.log(xmlData);
-
-    // Check if the total exceeds €100 and apply discount
-    if (getTotalPrice() > 100) {
-      console.log("You have qualified for a 10% discount.");
-    }
+    console.log(`Total Price: €${totalPrice.toFixed(2)}, Discounted Total: €${discountedTotal.toFixed(2)}`);
   }
 
   return (
     <div className="App">
       <h1>Shopping Basket</h1>
-      <div>
+      <div >
         <h2>Available Items</h2>
-        <ul>
+        <ul className="item-container">
           {ItemList.map((item) =>{
             return (
-              <li key={item.id}>
+              <li
+              className="item"
+              key={item.id}>
                 {item.name}  - €{item.price}
                 <button
+                className="button"
                 onClick={()=>handleAddItem(item.id)}
                 >Add to Basket</button>
               </li>
@@ -87,23 +98,37 @@ function App() {
       </div>
       <div>
         <h2>Basket</h2>
-        <ul>
+        <ul className="item-container">
           {basket.length === 0 ? "Your basket is empty" :
           <div>
             {basket.map((item) => {
               return (
-                <li key={item.id}>
+                <li
+                className="item"
+                 key={item.id}>
                   {item.name} (Quantity: {item.quantity}) : €{item.price}
                   <br/>
-                  <button onClick={()=>handleRemoveItem(item.id)}>Remove Item</button>
+                  <button
+                  className="button"
+                  onClick={()=>handleRemoveItem(item.id)}
+                  >Remove Item</button>
                 </li>
               )
             })}
           </div>
           }
         </ul>
-        <p>Total Price: €{getTotalPrice().toFixed(2)}</p>
-        <button onClick={handleBuy}>Buy</button>
+        <div className='item'>
+          <p className='total'>Total Price: €{getTotalPrice().toFixed(2)}</p>
+          {discount ? (
+          <p>Discounted Total: €{discountedTotal.toFixed(2)}</p>
+          ) : null
+          }
+        </div>
+        <button
+        className="button"
+        onClick={handleBuy}
+        >Buy</button>
       </div>
     </div>
   );
